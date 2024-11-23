@@ -41,6 +41,7 @@ MeetMomScript:
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
+	givepoke TOTODILE, 5, BERRY
 	addcellnum PHONE_MOM
 	setscene SCENE_PLAYERSHOUSE1F_NOOP
 	setevent EVENT_PLAYERS_HOUSE_MOM_1
