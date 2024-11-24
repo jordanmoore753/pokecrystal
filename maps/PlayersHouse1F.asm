@@ -5,7 +5,7 @@
 	const PLAYERSHOUSE1F_MOM4
 	const PLAYERSHOUSE1F_POKEFAN_F
 	const PLAYERSHOUSE1F_TRADEBACKNPC
-	
+
 PlayersHouse1F_MapScripts:
 	def_scene_scripts
 	scene_script PlayersHouse1FNoop1Scene, SCENE_PLAYERSHOUSE1F_MEET_MOM
@@ -410,3 +410,12 @@ PlayersHouse1F_MapEvents:
 	object_event  7,  4, SPRITE_MOM, SPRITEMOVEDATA_STANDING_LEFT, 0, 0, -1, DAY, 0, OBJECTTYPE_SCRIPT, 0, MomScript, EVENT_PLAYERS_HOUSE_MOM_2
 	object_event  0,  2, SPRITE_MOM, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, NITE, 0, OBJECTTYPE_SCRIPT, 0, MomScript, EVENT_PLAYERS_HOUSE_MOM_2
 	object_event  4,  4, SPRITE_POKEFAN_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, NeighborScript, EVENT_PLAYERS_HOUSE_1F_NEIGHBOR
+	object_event  7,  5, SPRITE_GYM_GUIDE, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, TradebackNPCScript, -1
+
+TradebackNPCScript:
+	faceplayer
+	opentext
+	special TradebackNPC
+	waitbutton
+	closetext
+	end
