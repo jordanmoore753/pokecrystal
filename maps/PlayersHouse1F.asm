@@ -4,7 +4,8 @@
 	const PLAYERSHOUSE1F_MOM3
 	const PLAYERSHOUSE1F_MOM4
 	const PLAYERSHOUSE1F_POKEFAN_F
-
+	const PLAYERSHOUSE1F_TRADEBACKNPC
+	
 PlayersHouse1F_MapScripts:
 	def_scene_scripts
 	scene_script PlayersHouse1FNoop1Scene, SCENE_PLAYERSHOUSE1F_MEET_MOM
