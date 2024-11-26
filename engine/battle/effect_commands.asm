@@ -4779,8 +4779,7 @@ CalcPlayerStats:
 	ld a, NUM_BATTLE_STATS
 	call CalcBattleStats
 
-	ld hl, BadgeStatBoosts
-	call CallBattleCore
+	; This is where badge stat boosts were applied in vanilla crystal.
 
 	call BattleCommand_SwitchTurn
 
