@@ -1253,11 +1253,7 @@ BattleCommand_Stab:
 	pop de
 	pop hl
 
-	push de
-	push bc
-	farcall DoBadgeTypeBoosts
-	pop bc
-	pop de
+	; This used to be where the badge boosts for types were applied.
 
 	ld a, [wCurType]
 	cp b
