@@ -43,6 +43,7 @@ MeetMomScript:
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
 	givepoke MEWTWO, 100
+	giveitem TM_SUBSTITUTE
 	addcellnum PHONE_MOM
 	setscene SCENE_PLAYERSHOUSE1F_NOOP
 	setevent EVENT_PLAYERS_HOUSE_MOM_1
