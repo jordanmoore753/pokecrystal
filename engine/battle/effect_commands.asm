@@ -3713,10 +3713,6 @@ BattleCommand_Poison:
 	bit SUBSTATUS_LOCK_ON, a
 	jr nz, .dont_sample_failure
 
-	call BattleRandom
-	cp 25 percent + 1 ; 25% chance AI fails
-	jr c, .failed
-
 .dont_sample_failure
 	call CheckSubstituteOpp
 	jr nz, .failed
