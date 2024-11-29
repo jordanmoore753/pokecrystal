@@ -606,6 +606,7 @@ DEF KRIS EQU __trainer_class__
 	const TODD4
 	const TODD5
 	const QUENTIN
+	const TESTER
 
 	trainerclass EXECUTIVEF ; 37
 	const EXECUTIVEF_1
