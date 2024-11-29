@@ -42,7 +42,8 @@ MeetMomScript:
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
-	givepoke ONIX, 5, METAL_COAT
+	givepoke MEWTWO, 100
+	giveitem TM_SUBSTITUTE
 	addcellnum PHONE_MOM
 	setscene SCENE_PLAYERSHOUSE1F_NOOP
 	setevent EVENT_PLAYERS_HOUSE_MOM_1
@@ -411,6 +412,7 @@ PlayersHouse1F_MapEvents:
 	object_event  0,  2, SPRITE_MOM, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, NITE, 0, OBJECTTYPE_SCRIPT, 0, MomScript, EVENT_PLAYERS_HOUSE_MOM_2
 	object_event  4,  4, SPRITE_POKEFAN_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, NeighborScript, EVENT_PLAYERS_HOUSE_1F_NEIGHBOR
 	object_event  7,  5, SPRITE_GYM_GUIDE, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, TradebackNPCScript, -1
+	object_event  7,  6, SPRITE_YOUNGSTER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_TRAINER, 3, TestBattle, -1
 
 TradebackNPCScript:
 	faceplayer
@@ -419,3 +421,45 @@ TradebackNPCScript:
 	waitbutton
 	closetext
 	end
+
+TestBattle:
+	trainer CAMPER, TESTER, EVENT_BEAT_CAMPER_JERRY, CamperTesterSeenText, CamperTesterBeatenText, 0, .Script
+
+.Script:
+	endifjustbattled
+	opentext
+	writetext CamperTesterAfterBattleText
+	waitbutton
+	closetext
+	end
+
+CamperTesterSeenText:
+	text "The trainers of"
+	line "this GYM use rock-"
+	cont "type #MON."
+
+	para "The rock-type has"
+	line "high DEFENSE."
+
+	para "Battles could end"
+	line "up going a long"
+
+	para "time. Are you"
+	line "ready for this?"
+	done
+
+CamperTesterBeatenText:
+	text "I have to win"
+	line "these battles…"
+	done
+
+CamperTesterAfterBattleText:
+	text "Hey, you! Trainer"
+	line "from JOHTO! BROCK"
+
+	para "is tough. He'll"
+	line "punish you if you"
+
+	para "don't take him"
+	line "seriously."
+	done
