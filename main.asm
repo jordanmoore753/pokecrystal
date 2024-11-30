@@ -687,6 +687,8 @@ INCLUDE "engine/events/odd_egg.asm"
 SECTION "Level Caps", ROMX
 
 INCLUDE "data/badge_level_caps.asm"
+INCLUDE "engine/pokemon/get_badge_count.asm"
+INCLUDE "engine/pokemon/get_level_cap.asm"
 
 
 SECTION "Stadium 2 Checksums", ROMX[$7DE0], BANK[$7F]
