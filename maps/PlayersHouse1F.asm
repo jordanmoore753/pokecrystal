@@ -42,7 +42,8 @@ MeetMomScript:
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
-	givepoke MEWTWO, 100
+	givepoke MEWTWO, 3
+	giveitem RARE_CANDY, 10
 	giveitem TM_SUBSTITUTE
 	addcellnum PHONE_MOM
 	setscene SCENE_PLAYERSHOUSE1F_NOOP
