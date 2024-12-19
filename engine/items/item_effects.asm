@@ -1273,11 +1273,6 @@ RareCandy_StatBooster_GetParameters:
 	call GetNickname
 	ret
 
-LevelCapsTable:
-	db 5
-	db 20
-	db 30
-
 RareCandyEffect:
 	ld b, PARTYMENUACTION_HEALING_ITEM
 	call UseItem_SelectMon
