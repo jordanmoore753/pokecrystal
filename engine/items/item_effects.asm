@@ -1284,20 +1284,20 @@ RareCandyEffect:
 	ld a, MON_LEVEL
 	call GetPartyParamLocation
 
-	push hl ; preserve the pokemon's level
+	push hl
 
-	ld hl, wBadges       ; Point HL to the start of wBadges (2 bytes)
-  ld b, 2              ; Process 2 bytes (16 badges total)
-  call CountSetBits    ; Count the number of bits set to 1 in wBadges
-  ld a, [wNumSetBits]  ; Load the result into A
+	ld hl, wBadges
+  ld b, 2
+  call CountSetBits
+  ld a, [wNumSetBits]
 
 	ld hl, LevelCapsTable
-	ld c, a ; put badge count in c
+	ld c, a
 	ld b, 0
 	add hl, bc
 	ld b, [hl]
 
-	pop hl ; bring back pokemon's level
+	pop hl
 
 	ld a, [hl]
 	cp b
