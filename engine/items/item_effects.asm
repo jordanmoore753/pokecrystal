@@ -1286,11 +1286,7 @@ RareCandyEffect:
 
 	push hl
 
-	ld hl, wBadges
-  ld b, 2
-  call CountSetBits
-  ld a, [wNumSetBits]
-
+	call GetBadgeCount
 	ld hl, LevelCapsTable
 	ld c, a
 	ld b, 0
