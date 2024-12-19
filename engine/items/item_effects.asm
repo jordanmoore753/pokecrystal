@@ -1273,6 +1273,11 @@ RareCandy_StatBooster_GetParameters:
 	call GetNickname
 	ret
 
+LevelCapsTable:
+	db 5
+	db 20
+	db 30
+
 RareCandyEffect:
 	ld b, PARTYMENUACTION_HEALING_ITEM
 	call UseItem_SelectMon
@@ -1284,8 +1289,23 @@ RareCandyEffect:
 	ld a, MON_LEVEL
 	call GetPartyParamLocation
 
+	push hl ; preserve the pokemon's level
+
+	ld hl, wBadges       ; Point HL to the start of wBadges (2 bytes)
+  ld b, 2              ; Process 2 bytes (16 badges total)
+  call CountSetBits    ; Count the number of bits set to 1 in wBadges
+  ld a, [wNumSetBits]  ; Load the result into A
+
+	ld hl, LevelCapsTable
+	ld c, a ; put badge count in c
+	ld b, 0
+	add hl, bc
+	ld b, [hl]
+
+	pop hl ; bring back pokemon's level
+
 	ld a, [hl]
-	cp MAX_LEVEL
+	cp b
 	jp nc, NoEffectMessage
 
 	inc a
