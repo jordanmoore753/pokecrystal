@@ -41,6 +41,7 @@ INCLUDE "engine/items/item_effects.asm"
 INCLUDE "engine/battle_anims/pokeball_wobble.asm"
 INCLUDE "engine/pokemon/knows_move.asm"
 INCLUDE "data/badge_level_caps.asm"
+INCLUDE "engine/pokemon/get_badge_count.asm"
 
 SECTION "bank4", ROMX
 
@@ -682,13 +683,6 @@ SECTION "Crystal Events", ROMX
 
 INCLUDE "engine/events/battle_tower/load_trainer.asm"
 INCLUDE "engine/events/odd_egg.asm"
-
-
-SECTION "Level Caps", ROMX
-
-INCLUDE "engine/pokemon/get_badge_count.asm"
-INCLUDE "engine/pokemon/get_level_cap.asm"
-
 
 SECTION "Stadium 2 Checksums", ROMX[$7DE0], BANK[$7F]
 
