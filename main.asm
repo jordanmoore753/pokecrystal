@@ -13,6 +13,7 @@ INCLUDE "engine/overworld/npc_movement.asm"
 INCLUDE "engine/events/happiness_egg.asm"
 INCLUDE "engine/events/shuckle.asm"
 INCLUDE "engine/events/haircut.asm"
+INCLUDE "engine/pokemon/get_max_level.asm"
 
 
 SECTION "bank2", ROMX
@@ -40,8 +41,7 @@ INCLUDE "engine/events/bug_contest/caught_mon.asm"
 INCLUDE "engine/items/item_effects.asm"
 INCLUDE "engine/battle_anims/pokeball_wobble.asm"
 INCLUDE "engine/pokemon/knows_move.asm"
-INCLUDE "data/badge_level_caps.asm"
-INCLUDE "engine/pokemon/get_badge_count.asm"
+
 
 SECTION "bank4", ROMX
 
