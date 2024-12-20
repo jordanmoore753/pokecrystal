@@ -1285,14 +1285,7 @@ RareCandyEffect:
 	call GetPartyParamLocation
 
 	push hl
-
-	call GetBadgeCount
-	ld hl, LevelCapsTable
-	ld c, a
-	ld b, 0
-	add hl, bc
-	ld b, [hl]
-
+	farcall GetMaxLevel
 	pop hl
 
 	ld a, [hl]
