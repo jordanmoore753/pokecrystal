@@ -1,8 +1,5 @@
-LevelCapsTable:
-  db 5
-  db 10
-  db 20
-  db 30
+SECTION "Unused Alignment", ROMX
+ds 4  ; reserve 4 bytes
 
 GetMaxLevel:
   ld hl, wJohtoBadges
