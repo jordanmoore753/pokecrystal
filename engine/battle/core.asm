@@ -7062,7 +7062,8 @@ GiveExperiencePoints:
 	ld [wCurSpecies], a
 	call GetBaseData
 	push bc
-	ld d, MAX_LEVEL
+	callfar GetMaxLevel
+	ld d, b ; WORKS!
 	callfar CalcExpAtLevel
 	pop bc
 	ld hl, MON_EXP + 2
@@ -7089,8 +7090,9 @@ GiveExperiencePoints:
 	ld [hld], a
 
 .not_max_exp
-; Check if the mon leveled up
-	xor a ; PARTYMON
+	call GetMaxLevel ; WORKS!
+	ld e, b
+	xor a
 	ld [wMonType], a
 	predef CopyMonToTempMon
 	callfar CalcLevel
@@ -7098,7 +7100,7 @@ GiveExperiencePoints:
 	ld hl, MON_LEVEL
 	add hl, bc
 	ld a, [hl]
-	cp MAX_LEVEL
+	cp e
 	jp nc, .next_mon
 	cp d
 	jp z, .next_mon
@@ -7339,13 +7341,16 @@ ExpPointsText:
 AnimateExpBar:
 	push bc
 
+	callfar GetMaxLevel ; WORKS!
+	ld e, b
+
 	ld hl, wCurPartyMon
 	ld a, [wCurBattleMon]
 	cp [hl]
 	jp nz, .finish
 
 	ld a, [wBattleMonLevel]
-	cp MAX_LEVEL
+	cp e
 	jp nc, .finish
 
 	ldh a, [hProduct + 3]
@@ -7382,7 +7387,10 @@ AnimateExpBar:
 	ld [hl], a
 
 .NoOverflow:
-	ld d, MAX_LEVEL
+	callfar GetMaxLevel ; WORKS!
+	ld d, b
+	pop bc
+	push bc
 	callfar CalcExpAtLevel
 	ldh a, [hProduct + 1]
 	ld b, a
@@ -7417,8 +7425,17 @@ AnimateExpBar:
 	ld d, a
 
 .LoopLevels:
+	push bc
+	callfar GetMaxLevel ; WORKS!
+	ld a, b
+	ld [wTempByteValue], a
+	pop bc
+
+	ld a, [wTempByteValue]
+	ld l, a
+
 	ld a, e
-	cp MAX_LEVEL
+	cp l
 	jr nc, .FinishExpBar
 	cp d
 	jr z, .FinishExpBar
