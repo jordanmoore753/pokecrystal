@@ -42,7 +42,10 @@ MeetMomScript:
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
+	setflag ENGINE_FOGBADGE
+	giveitem EXP_SHARE
 	givepoke MEWTWO, 3
+	givepoke KOFFING, 3
 	giveitem RARE_CANDY, 10
 	giveitem TM_SUBSTITUTE
 	addcellnum PHONE_MOM
@@ -437,16 +440,6 @@ TestBattle:
 CamperTesterSeenText:
 	text "The trainers of"
 	line "this GYM use rock-"
-	cont "type #MON."
-
-	para "The rock-type has"
-	line "high DEFENSE."
-
-	para "Battles could end"
-	line "up going a long"
-
-	para "time. Are you"
-	line "ready for this?"
 	done
 
 CamperTesterBeatenText:
