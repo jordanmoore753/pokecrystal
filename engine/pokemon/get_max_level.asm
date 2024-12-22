@@ -5,13 +5,31 @@ LevelCapsTable:
   db 30
 
 GetMaxLevel:
-  ld hl, wBadges       ; Point HL to the start of wBadges (2 bytes)
-  ld b, 2              ; Process 2 bytes (16 badges total)
-  call CountSetBits    ; Count the number of bits set to 1 in wBadges
-  ld a, [wNumSetBits]  ; Load the result into A
-  ld hl, LevelCapsTable
-	ld c, a
-	ld b, 0
-	add hl, bc
-	ld b, [hl]
+  ld hl, wJohtoBadges
+
+	bit RISINGBADGE, [hl]
+	ld a, MAX_LEVEL + 1
+	jr nz, .exit
+
+	; stormbadge
+	bit STORMBADGE, [hl]
+	ld a, 70
+	jr nz, .exit
+
+	; fogbadge
+	bit FOGBADGE, [hl]
+	ld a, 50
+	jr nz, .exit
+
+	; hivebadge
+	bit HIVEBADGE, [hl]
+	ld a, 10
+	jr nz, .exit
+
+	; no badges
+	ld a, 5
+  jr .exit
+
+.exit
+  ld b, a
   ret
