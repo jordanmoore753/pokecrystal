@@ -6973,6 +6973,18 @@ GiveExperiencePoints:
 	inc de
 	dec c
 	jr nz, .stat_exp_loop
+	pop bc ; WORKS!
+	ld hl, MON_LEVEL
+	add hl, bc
+	push bc
+	push hl
+	callfar GetMaxLevel
+	pop hl
+	ld a, [hl]
+	cp b
+	pop bc
+	jp nc, .next_mon
+	push bc
 	xor a
 	ldh [hMultiplicand + 0], a
 	ldh [hMultiplicand + 1], a
@@ -7270,12 +7282,33 @@ GiveExperiencePoints:
 	ld a, [wBattleParticipantsNotFainted]
 	ld b, a
 	ld c, PARTY_LENGTH
-	ld d, 0
+	ld de, 0
 .count_loop
+	push bc
+	push de
+	callfar GetMaxLevel ; WORKS!
+	ld a, b
+	ld [wTempByteValue], a
+	ld a, e
+	ld hl, wPartyMon1Level
+	call GetPartyLocation
+	ld a, [wTempByteValue]
+	ld b, a
+	ld a, [hl]
+	cp b
+	pop de
+	pop bc
+	jr c, .gains_exp
+	srl b
+	ld a, d
+	jr .no_exp
+.gains_exp
 	xor a
 	srl b
 	adc d
 	ld d, a
+.no_exp
+	inc e
 	dec c
 	jr nz, .count_loop
 	cp 2
