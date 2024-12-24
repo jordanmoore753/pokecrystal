@@ -6973,6 +6973,18 @@ GiveExperiencePoints:
 	inc de
 	dec c
 	jr nz, .stat_exp_loop
+	pop bc ; WORKS!
+	ld hl, MON_LEVEL
+	add hl, bc
+	push bc
+	push hl
+	callfar GetMaxLevel
+	pop hl
+	ld a, [hl]
+	cp b
+	pop bc
+	jp nc, .next_mon
+	push bc
 	xor a
 	ldh [hMultiplicand + 0], a
 	ldh [hMultiplicand + 1], a
@@ -7062,7 +7074,8 @@ GiveExperiencePoints:
 	ld [wCurSpecies], a
 	call GetBaseData
 	push bc
-	ld d, MAX_LEVEL
+	callfar GetMaxLevel
+	ld d, b ; WORKS!
 	callfar CalcExpAtLevel
 	pop bc
 	ld hl, MON_EXP + 2
@@ -7089,8 +7102,9 @@ GiveExperiencePoints:
 	ld [hld], a
 
 .not_max_exp
-; Check if the mon leveled up
-	xor a ; PARTYMON
+	call GetMaxLevel ; WORKS!
+	ld e, b
+	xor a
 	ld [wMonType], a
 	predef CopyMonToTempMon
 	callfar CalcLevel
@@ -7098,7 +7112,7 @@ GiveExperiencePoints:
 	ld hl, MON_LEVEL
 	add hl, bc
 	ld a, [hl]
-	cp MAX_LEVEL
+	cp e
 	jp nc, .next_mon
 	cp d
 	jp z, .next_mon
@@ -7268,12 +7282,33 @@ GiveExperiencePoints:
 	ld a, [wBattleParticipantsNotFainted]
 	ld b, a
 	ld c, PARTY_LENGTH
-	ld d, 0
+	ld de, 0
 .count_loop
+	push bc
+	push de
+	callfar GetMaxLevel ; WORKS!
+	ld a, b
+	ld [wTempByteValue], a
+	ld a, e
+	ld hl, wPartyMon1Level
+	call GetPartyLocation
+	ld a, [wTempByteValue]
+	ld b, a
+	ld a, [hl]
+	cp b
+	pop de
+	pop bc
+	jr c, .gains_exp
+	srl b
+	ld a, d
+	jr .no_exp
+.gains_exp
 	xor a
 	srl b
 	adc d
 	ld d, a
+.no_exp
+	inc e
 	dec c
 	jr nz, .count_loop
 	cp 2
@@ -7339,13 +7374,16 @@ ExpPointsText:
 AnimateExpBar:
 	push bc
 
+	callfar GetMaxLevel ; WORKS!
+	ld e, b
+
 	ld hl, wCurPartyMon
 	ld a, [wCurBattleMon]
 	cp [hl]
 	jp nz, .finish
 
 	ld a, [wBattleMonLevel]
-	cp MAX_LEVEL
+	cp e
 	jp nc, .finish
 
 	ldh a, [hProduct + 3]
@@ -7382,7 +7420,10 @@ AnimateExpBar:
 	ld [hl], a
 
 .NoOverflow:
-	ld d, MAX_LEVEL
+	callfar GetMaxLevel ; WORKS!
+	ld d, b
+	pop bc
+	push bc
 	callfar CalcExpAtLevel
 	ldh a, [hProduct + 1]
 	ld b, a
@@ -7417,8 +7458,17 @@ AnimateExpBar:
 	ld d, a
 
 .LoopLevels:
+	push bc
+	callfar GetMaxLevel ; WORKS!
+	ld a, b
+	ld [wTempByteValue], a
+	pop bc
+
+	ld a, [wTempByteValue]
+	ld l, a
+
 	ld a, e
-	cp MAX_LEVEL
+	cp l
 	jr nc, .FinishExpBar
 	cp d
 	jr z, .FinishExpBar

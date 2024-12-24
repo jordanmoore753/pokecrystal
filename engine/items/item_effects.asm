@@ -1284,8 +1284,12 @@ RareCandyEffect:
 	ld a, MON_LEVEL
 	call GetPartyParamLocation
 
+	push hl
+	farcall GetMaxLevel
+	pop hl
+
 	ld a, [hl]
-	cp MAX_LEVEL
+	cp b
 	jp nc, NoEffectMessage
 
 	inc a
