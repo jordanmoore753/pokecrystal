@@ -2,6 +2,12 @@ SECTION "Reserved Bytes", ROMX
 ds 4  ; reserve 4 bytes
 
 GetMaxLevel:
+  ld hl, wKantoBadges
+
+  bit EARTHBADGE, [hl]
+  ld a, 8
+  jr nz, .exit
+
   ld hl, wJohtoBadges
 
   bit RISINGBADGE, [hl]

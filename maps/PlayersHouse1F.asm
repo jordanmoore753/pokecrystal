@@ -42,9 +42,9 @@ MeetMomScript:
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
 	setflag ENGINE_POKEDEX
-	setflag ENGINE_FOGBADGE
+	setflag ENGINE_HIVEBADGE
 	giveitem EXP_SHARE
-	givepoke MEWTWO, 3
+	givepoke MEWTWO, 6
 	givepoke KOFFING, 3
 	giveitem RARE_CANDY, 10
 	giveitem TM_SUBSTITUTE
