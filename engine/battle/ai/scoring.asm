@@ -387,6 +387,7 @@ AI_Smart_EffectHandlers:
 	dbw EFFECT_SOLARBEAM,        AI_Smart_Solarbeam
 	dbw EFFECT_THUNDER,          AI_Smart_Thunder
 	dbw EFFECT_FLY,              AI_Smart_Fly
+	dbw EFFECT_QUICK_ATTACK,     AI_Smart_QuickAttack
 	db -1 ; end
 
 AI_Smart_Sleep:
