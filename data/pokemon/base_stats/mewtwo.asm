@@ -1,6 +1,6 @@
 	db MEWTWO ; 150
 
-	db 106, 110,  90, 130, 154,  90
+	db 255, 255,  255, 255, 255,  255
 	;   hp  atk  def  spd  sat  sdf
 
 	db PSYCHIC_TYPE, PSYCHIC_TYPE ; type
