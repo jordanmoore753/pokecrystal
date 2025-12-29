@@ -5,12 +5,12 @@ CheckPlayerMoveTypeMatchups:
 	push hl
 	push de
 	push bc
-	ld a, BASE_AI_SWITCH_SCORE
-	ld [wEnemyAISwitchScore], a
-	ld hl, wPlayerUsedMoves
-	ld a, [hl]
+	ld a, BASE_AI_SWITCH_SCORE 	; 10 is base score
+	ld [wEnemyAISwitchScore], a ; keep track of switch score
+	ld hl, wPlayerUsedMoves			; load list of used moves by human
+	ld a, [hl]									; this is at most 4
 	and a
-	jr z, .unknown_moves
+	jr z, .unknown_moves				; if no moves used, go to check type matchup of mons
 
 	ld d, NUM_MOVES
 	ld e, 0
