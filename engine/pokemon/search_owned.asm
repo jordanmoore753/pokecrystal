@@ -227,7 +227,7 @@ rept NAME_LENGTH_JAPANESE - 2
 	ld a, [de]
 	cp [hl]
 	jr nz, .notfound
-	cp "@"
+	cp '@'
 	jr z, .found
 	inc hl
 	inc de
@@ -252,7 +252,7 @@ endr
 	ret
 
 SearchBoxAddressTable:
-	table_width 3, SearchBoxAddressTable
+	table_width 3
 for n, 1, NUM_BOXES + 1
 	dba sBox{d:n}
 endr

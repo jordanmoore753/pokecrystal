@@ -47,15 +47,18 @@ Fixes in the [multi-player battle engine](#multi-player-battle-engine) category 
   - [Love Ball boosts catch rate for the wrong gender](#love-ball-boosts-catch-rate-for-the-wrong-gender)
   - [Fast Ball only boosts catch rate for three Pokémon](#fast-ball-only-boosts-catch-rate-for-three-pok%C3%A9mon)
   - [Heavy Ball uses wrong weight value for three Pokémon](#heavy-ball-uses-wrong-weight-value-for-three-pok%C3%A9mon)
+  - [Catch rate formula breaks for Pokémon with max HP > 341](#catch-rate-formula-breaks-for-pok%C3%A9mon-with-max-hp--341)
   - [PRZ and BRN stat reductions don't apply to switched Pokémon](#prz-and-brn-stat-reductions-dont-apply-to-switched-pok%C3%A9mon)
   - [Glacier Badge may not boost Special Defense depending on the value of Special Attack](#glacier-badge-may-not-boost-special-defense-depending-on-the-value-of-special-attack)
   - ["Smart" AI encourages Mean Look if its own Pokémon is badly poisoned](#smart-ai-encourages-mean-look-if-its-own-pok%C3%A9mon-is-badly-poisoned)
   - ["Smart" AI discourages Conversion2 after the first turn](#smart-ai-discourages-conversion2-after-the-first-turn)
   - ["Smart" AI does not encourage Solar Beam, Flame Wheel, or Moonlight during Sunny Day](#smart-ai-does-not-encourage-solar-beam-flame-wheel-or-moonlight-during-sunny-day)
+  - ["Cautious" AI may fail to discourage residual moves](#cautious-ai-may-fail-to-discourage-residual-moves)
   - [AI does not discourage Future Sight when it's already been used](#ai-does-not-discourage-future-sight-when-its-already-been-used)
   - [AI makes a false assumption about `CheckTypeMatchup`](#ai-makes-a-false-assumption-about-checktypematchup)
   - [AI use of Full Heal or Full Restore does not cure Nightmare status](#ai-use-of-full-heal-or-full-restore-does-not-cure-nightmare-status)
   - [AI use of Full Heal does not cure confusion status](#ai-use-of-full-heal-does-not-cure-confusion-status)
+  - [AI use of Full Heal or Full Restore does not cure Attack or Speed drops from burn or paralysis](#ai-use-of-full-heal-or-full-restore-does-not-cure-attack-or-speed-drops-from-Burn-or-Paralysis)
   - [AI might use its base reward value as an item](#ai-might-use-its-base-reward-value-as-an-item)
   - [Wild Pokémon can always Teleport regardless of level difference](#wild-pok%C3%A9mon-can-always-teleport-regardless-of-level-difference)
   - [`RIVAL2` has lower DVs than `RIVAL1`](#rival2-has-lower-dvs-than-rival1)
@@ -100,11 +103,13 @@ Fixes in the [multi-player battle engine](#multi-player-battle-engine) category 
   - [`CheckOwnMon` only checks the first five letters of OT names](#checkownmon-only-checks-the-first-five-letters-of-ot-names)
   - [`CheckOwnMonAnywhere` does not check the Day-Care](#checkownmonanywhere-does-not-check-the-day-care)
   - [The unused `phonecall` script command may crash](#the-unused-phonecall-script-command-may-crash)
+  - [Mania uses wrong dialogue for trying to return Shuckie with no other Pokémon](#mania-uses-wrong-dialogue-for-trying-to-return-shuckie-with-no-other-pok%C3%A9mon)
 - [Internal engine routines](#internal-engine-routines)
   - [Saves corrupted by mid-save shutoff are not handled](#saves-corrupted-by-mid-save-shutoff-are-not-handled)
   - [`ScriptCall` can overflow `wScriptStack` and crash](#scriptcall-can-overflow-wscriptstack-and-crash)
   - [`LoadSpriteGFX` does not limit the capacity of `UsedSprites`](#loadspritegfx-does-not-limit-the-capacity-of-usedsprites)
   - [`ChooseWildEncounter` doesn't really validate the wild Pokémon species](#choosewildencounter-doesnt-really-validate-the-wild-pok%C3%A9mon-species)
+  - [`RandomUnseenWildMon` always picks a morning Pokémon species](#randomunseenwildmon-always-picks-a-morning-pok%C3%A9mon-species)
   - [`TryObjectEvent` arbitrary code execution](#tryobjectevent-arbitrary-code-execution)
   - [`ReadObjectEvents` overflows into `wObjectMasks`](#readobjectevents-overflows-into-wobjectmasks)
   - [`ClearWRAM` only clears WRAM bank 1](#clearwram-only-clears-wram-bank-1)
@@ -1193,6 +1198,41 @@ Note that this fix only accounts for Pokémon that evolve via Moon Stone as thei
 ```
 
 
+### Catch rate formula breaks for Pokémon with max HP > 341
+
+HP values above 341 remain larger than 1 byte after division.
+
+**Fix:** Edit `PokeBallEffect` in [engine/items/item_effects.asm](https://github.com/pret/pokecrystal/blob/master/engine/items/item_effects.asm):
+
+```diff
+	srl d
+	rr e
+	srl d
+	rr e
+	srl b
+	rr c
+	srl b
+	rr c
+
+-	; BUG: Catch rate formula breaks for Pokémon with max HP > 341 (see docs/bugs_and_glitches.md)
++	; Divide by 2 again if there's still something in the high byte
++	ld a, d
++	and a
++	jr z, .check_cur_low
++	srl d
++	rr e
++	srl b
++	rr c
++.check_cur_low
+	ld a, c
+	and a
+	jr nz, .okay_1
+	ld c, $1
+.okay_1
+	ld b, e
+```
+
+
 ### PRZ and BRN stat reductions don't apply to switched Pokémon
 
 This does not affect link battles or Battle Tower battles because those jump from `LoadEnemyMon` to `InitEnemyMon`, which already calls `ApplyStatusEffectOnEnemyStats`.
@@ -1267,13 +1307,13 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
 ```
 
 
-### "Smart" AI does not encourage Solar Beam, Flame Wheel, or Moonlight during Sunny Day
+### "Smart" AI does not encourage Sunny Day when it knows Solar Beam, Flame Wheel, or Moonlight
 
 **Fix:** Edit `SunnyDayMoves` in [data/battle/ai/sunny_day_moves.asm](https://github.com/pret/pokecrystal/blob/master/data/battle/ai/sunny_day_moves.asm):
 
 ```diff
  SunnyDayMoves:
--; BUG: "Smart" AI does not encourage Solar Beam, Flame Wheel, or Moonlight during Sunny Day (see docs/bugs_and_glitches.md)
+-; BUG: "Smart" AI does not encourage Sunny Day when it knows Solar Beam, Flame Wheel, or Moonlight (see docs/bugs_and_glitches.md)
  	db FIRE_PUNCH
  	db EMBER
  	db FLAMETHROWER
@@ -1289,6 +1329,32 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
 ```
 
 
+### "Cautious" AI may fail to discourage residual moves
+
+**Fix:** Edit `AI_Cautious` in [engine/battle/ai/scoring.asm](https://github.com/pret/pokecrystal/blob/master/engine/battle/ai/scoring.asm):
+
+```diff
+AI_Cautious:
+; 90% chance to discourage moves with residual effects after the first turn.
+
+	...
+
+	pop bc
+	pop de
+	pop hl
+	jr nc, .loop
+
+-; BUG: "Cautious" AI may fail to discourage residual moves (see docs/bugs_and_glitches.md)
+	call Random
+	cp 90 percent + 1
+-	ret nc
++	jr nc, .loop
+
+	inc [hl]
+	jr .loop
+```
+
+
 ### AI does not discourage Future Sight when it's already been used
 
 **Fix:** Edit `AI_Redundant` in [engine/battle/ai/redundant.asm](https://github.com/pret/pokecrystal/blob/master/engine/battle/ai/redundant.asm):
@@ -1297,7 +1363,7 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
  .FutureSight:
 -; BUG: AI does not discourage Future Sight when it's already been used (see docs/bugs_and_glitches.md)
 -	ld a, [wEnemyScreens]
--	bit 5, a
+-	bit SCREENS_UNUSED, a
 +	ld a, [wEnemyFutureSightCount]
 +	and a
  	ret
@@ -1341,6 +1407,7 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
 ```diff
  AI_HealStatus:
 -; BUG: AI use of Full Heal or Full Restore does not cure Nightmare status (see docs/bugs_and_glitches.md)
+ ; BUG: AI use of Full Heal or Full Restore does not cure Attack or Speed drops from burn or paralysis (see docs/bugs_and_glitches.md)
  	ld a, [wCurOTMon]
  	ld hl, wOTPartyMon1Status
  	ld bc, PARTYMON_STRUCT_LENGTH
@@ -1376,6 +1443,7 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
 ```diff
  AI_HealStatus:
  ; BUG: AI use of Full Heal or Full Restore does not cure Nightmare status (see docs/bugs_and_glitches.md)
+ ; BUG: AI use of Full Heal or Full Restore does not cure Attack or Speed drops from burn or paralysis (see docs/bugs_and_glitches.md)
  	ld a, [wCurOTMon]
  	ld hl, wOTPartyMon1Status
  	ld bc, PARTYMON_STRUCT_LENGTH
@@ -1388,6 +1456,27 @@ Pryce's dialog ("That BADGE will raise the SPECIAL stats of POKéMON.") implies 
 +	res SUBSTATUS_CONFUSED, [hl]
  	ld hl, wEnemySubStatus5
  	res SUBSTATUS_TOXIC, [hl]
+ 	ret
+```
+
+### AI use of Full Heal or Full Restore does not cure Attack or Speed drops from burn or paralysis
+
+**Fix:** Edit `AI_HealStatus` in [engine/battle/ai/items.asm](https://github.com/pret/pokecrystal/blob/master/engine/battle/ai/items.asm):
+
+```diff
+ AI_HealStatus:
+ ; BUG: AI use of Full Heal or Full Restore does not cure Nightmare status (see docs/bugs_and_glitches.md)
+-; BUG: AI use of Full Heal or Full Restore does not cure Attack or Speed drops from burn or paralysis (see docs/bugs_and_glitches.md)
+ 	ld a, [wCurOTMon]
+ 	ld hl, wOTPartyMon1Status
+ 	ld bc, PARTYMON_STRUCT_LENGTH
+ 	call AddNTimes
+ 	xor a
+ 	ld [hl], a
+ 	ld [wEnemyMonStatus], a
+ 	ld hl, wEnemySubStatus5
+ 	res SUBSTATUS_TOXIC, [hl]
++	farcall CalcEnemyStats
  	ret
 ```
 
@@ -1505,7 +1594,7 @@ To select a move in battle, you have to press and release the Up or Down buttons
  	pop af
  	ldh [hVBlank], a
  	pop af
- 	ldh [rSVBK], a
+ 	ldh [rWBK], a
 ```
 
 The `[hInMenu]` value determines this button behavior. However, the battle moves menu doesn't actually set `[hInMenu]` to anything, so either behavior *may* have been intentional. The default 0 prevents continuous scrolling; a value of 1 allows it. (The Japanese release sets it to 0.)
@@ -1620,10 +1709,10 @@ Then edit `SurfStartStep` in [engine/overworld/player_object.asm](https://github
 -	slow_step UP
 -	slow_step LEFT
 -	slow_step RIGHT
-+	db D_DOWN,  0, -1
-+	db D_UP,    0, -1
-+	db D_LEFT,  0, -1
-+	db D_RIGHT, 0, -1
++	db PAD_DOWN,  0, -1
++	db PAD_UP,    0, -1
++	db PAD_LEFT,  0, -1
++	db PAD_RIGHT, 0, -1
 ```
 
 This fix will make the player enter the water at a normal walking speed, not with a slow step.
@@ -2008,7 +2097,7 @@ Finally, edit [engine/battle/read_trainer_party.asm](https://github.com/pret/pok
 +	ld [wCurPartyLevel], a
 +
 +	ld a, [wInBattleTowerBattle]
-+	bit 0, a
++	bit IN_BATTLE_TOWER_BATTLE_F, a
 +	ret nz
 +
 +	ld a, [wLinkMode]
@@ -2063,6 +2152,7 @@ Most trainer classes always use the same sprite and color for their overworld NP
 - [maps/Route44.asm](https://github.com/pret/pokecrystal/blob/master/maps/Route44.asm): `TrainerPokemaniacZach` should use `PAL_NPC_BLUE`, not `PAL_NPC_GREEN`
 - [maps/UnionCaveB2F.asm](https://github.com/pret/pokecrystal/blob/master/maps/UnionCaveB2F.asm): `TrainerCooltrainermNick` should use `SPRITE_COOLTRAINER_M`, not `SPRITE_ROCKER`
 - [maps/FuchsiaPokecenter1F.asm](https://github.com/pret/pokecrystal/blob/master/maps/FuchsiaPokecenter1F.asm): `FuchsiaPokecenter1FNurseScript` should use `PAL_NPC_RED`, not `PAL_NPC_GREEN`
+- [maps/IlexForest.asm](https://github.com/pret/pokecrystal/blob/master/maps/IlexForest.asm): `TrainerBugCatcherWayne` should use `SPRITE_BUG_CATCHER` and `PAL_NPC_BROWN`, not `SPRITE_YOUNGSTER` and `PAL_NPC_GREEN`
 
 Most of the NPCs in [maps/NationalParkBugContest.asm](https://github.com/pret/pokecrystal/blob/master/maps/NationalParkBugContest.asm) and [maps/Route36NationalParkGate.asm](https://github.com/pret/pokecrystal/blob/master/maps/Route36NationalParkGate.asm) are also inconsistent with their trainers from other maps:
 
@@ -2190,6 +2280,18 @@ The exact cause of this bug is unknown.
 +	ld a, [wCurPartySpecies]
 +	call PlayMonCry
  	ret
+```
+
+
+### `SFX_RUN` does not play correctly when a wild Pokémon flees from battle
+
+**Fix:** Edit `WildFled_EnemyFled_LinkBattleCanceled` in [engine/battle/core.asm](https://github.com/pret/pokecrystal/blob/master/engine/battle/core.asm):
+
+```diff
+-; BUG: SFX_RUN does not play correctly when a wild Pokemon flees from battle (see docs/bugs_and_glitches.md)
+  ld de, SFX_RUN
+- call PlaySFX
++ call WaitPlaySFX
 ```
 
 
@@ -2535,6 +2637,17 @@ The `phonecall` script command calls the `PhoneCall` routine, which calls the `B
 You can also delete the now-unused `BrokenPlaceFarString` routine in the same file.
 
 
+### Mania uses wrong dialogue for trying to return Shuckie with no other Pokémon
+
+**Fix**: Edit `ManiaScript.returnshuckie` in [maps/ManiasHouse.asm](https://github.com/pret/pokecrystal/blob/master/maps/ManiasHouse.asm):
+
+```diff
+-; BUG: Mania uses wrong dialogue for trying to return Shuckie with no other Pokémon (see docs/bugs_and_glitches.md)
+-	ifequal SHUCKIE_FAINTED, .default_postevent
++	ifequal SHUCKIE_FAINTED, .nothingleft
+```
+
+
 ## Internal engine routines
 
 
@@ -2637,6 +2750,25 @@ This allows Pokémon to be duplicated, among other effects. It does not have a s
 ```
 
 
+### `RandomUnseenWildMon` always picks a morning Pokémon species
+
+**Fix:** Edit `RandomUnseenWildMon` in [engine/overworld/wildmons.asm](https://github.com/pret/pokecrystal/blob/master/engine/overworld/wildmons.asm):
+
+```diff
+ .GetGrassmon:
+-; BUG: RandomUnseenWildMon always picks a morning Pokémon species (see docs/bugs_and_glitches.md)
++	ld a, [wTimeOfDay]
++	ld bc, NUM_GRASSMON * 2
++	call AddNTimes
+ 	push hl
+ 	ld bc, 5 + 4 * 2 ; Location of the level of the 5th wild Pokemon in that map
+ 	add hl, bc
+-	ld a, [wTimeOfDay]
+-	ld bc, NUM_GRASSMON * 2
+-	call AddNTimes
+```
+
+
 ### `TryObjectEvent` arbitrary code execution
 
 If `IsInArray` returns `nc`, data at `bc` will be executed as code.
@@ -2709,7 +2841,7 @@ If `IsInArray` returns `nc`, data at `bc` will be executed as code.
  	ld a, 1
  .bank_loop
  	push af
- 	ldh [rSVBK], a
+ 	ldh [rWBK], a
  	xor a
  	ld hl, STARTOF(WRAMX)
  	ld bc, SIZEOF(WRAMX)
@@ -2757,16 +2889,4 @@ This bug allows all the options to be updated at once if the left or right butto
  	ld hl, hInMenu
  	ld a, [hl]
  	push af
-```
-
-
-### `SFX_RUN` does not play correctly when a wild Pokémon flees from battle
-
-**Fix:** Edit `WildFled_EnemyFled_LinkBattleCanceled` in [engine/battle/core.asm](https://github.com/pret/pokecrystal/blob/master/engine/battle/core.asm):
-
-```diff
--; BUG: SFX_RUN does not play correctly when a wild Pokemon flees from battle (see docs/bugs_and_glitches.md)
- 	ld de, SFX_RUN
--	call PlaySFX
-+	call WaitPlaySFX
 ```

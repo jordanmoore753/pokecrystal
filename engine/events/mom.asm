@@ -7,7 +7,7 @@ BankOfMom:
 	ld [wJumptableIndex], a
 .loop
 	ld a, [wJumptableIndex]
-	bit 7, a
+	bit JUMPTABLE_EXIT_F, a
 	jr nz, .done
 	call .RunJumptable
 	jr .loop
@@ -278,13 +278,13 @@ BankOfMom:
 
 .AskDST:
 	ld hl, wJumptableIndex
-	set 7, [hl]
+	set JUMPTABLE_EXIT_F, [hl]
 	ret
 
 DSTChecks:
 ; check the time; avoid changing DST if doing so would change the current day
 	ld a, [wDST]
-	bit 7, a
+	bit DST_F, a
 	ldh a, [hHours]
 	jr z, .NotDST
 	and a ; within one hour of 00:00?
@@ -313,14 +313,14 @@ DSTChecks:
 	call .ClearBox
 	bccoord 1, 14
 	ld a, [wDST]
-	bit 7, a
+	bit DST_F, a
 	jr z, .SetDST
 	ld hl, .TimesetAskNotDSTText
 	call PrintTextboxTextAt
 	call YesNoBox
 	ret c
 	ld a, [wDST]
-	res 7, a
+	res DST_F, a
 	ld [wDST], a
 	call .SetClockBack
 	call .ClearBox
@@ -335,7 +335,7 @@ DSTChecks:
 	call YesNoBox
 	ret c
 	ld a, [wDST]
-	set 7, a
+	set DST_F, a
 	ld [wDST], a
 	call .SetClockForward
 	call .ClearBox
@@ -451,17 +451,17 @@ Mom_WithdrawDepositMenuJoypad:
 	call JoyTextDelay
 	ld hl, hJoyPressed
 	ld a, [hl]
-	and B_BUTTON
+	and PAD_B
 	jr nz, .pressedB
 	ld a, [hl]
-	and A_BUTTON
+	and PAD_A
 	jr nz, .pressedA
 	call .dpadaction
 	xor a
 	ldh [hBGMapMode], a
 	hlcoord 12, 6
 	ld bc, 7
-	ld a, " "
+	ld a, ' '
 	call ByteFill
 	hlcoord 12, 6
 	ld de, wStringBuffer2
@@ -475,7 +475,7 @@ Mom_WithdrawDepositMenuJoypad:
 	ld c, a
 	ld b, 0
 	add hl, bc
-	ld [hl], " "
+	ld [hl], ' '
 
 .skip
 	call WaitBGMap
@@ -492,16 +492,16 @@ Mom_WithdrawDepositMenuJoypad:
 .dpadaction
 	ld hl, hJoyLast
 	ld a, [hl]
-	and D_UP
+	and PAD_UP
 	jr nz, .incrementdigit
 	ld a, [hl]
-	and D_DOWN
+	and PAD_DOWN
 	jr nz, .decrementdigit
 	ld a, [hl]
-	and D_LEFT
+	and PAD_LEFT
 	jr nz, .movecursorleft
 	ld a, [hl]
-	and D_RIGHT
+	and PAD_RIGHT
 	jr nz, .movecursorright
 	and a
 	ret
