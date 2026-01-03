@@ -31,6 +31,7 @@ DEF EFFECTIVENESS_MASK EQU %01111111
 
 ; enemy AI behavior
 DEF BASE_AI_SWITCH_SCORE EQU 10
+DEF AI_SWITCH_SCORE_INCREMENT EQU 10
 
 ; wPlayerStatLevels and wEnemyStatLevels indexes (see wram.asm)
 ; GetStatName arguments (see data/battle/stat_names.asm)
