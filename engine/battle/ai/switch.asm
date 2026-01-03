@@ -222,7 +222,7 @@ CheckAbleToSwitch:
 .no_perish
 	call CheckPlayerMoveTypeMatchups
 	ld a, [wEnemyAISwitchScore]
-	cp 11
+	cp BASE_AI_SWITCH_SCORE + 1
 	ret nc
 
 	ld a, [wLastPlayerCounterMove]
