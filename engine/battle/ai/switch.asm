@@ -251,7 +251,7 @@ CheckAbleToSwitch:
 	ret nc
 
 	ld a, b
-	add $10
+	add AI_SWITCH_SCORE_INCREMENT
 	ld [wEnemySwitchMonParam], a
 	ret
 
@@ -285,7 +285,7 @@ CheckAbleToSwitch:
 	ret nz
 
 	ld a, [wEnemyAISwitchScore]
-	add $10
+	add AI_SWITCH_SCORE_INCREMENT
 	ld [wEnemySwitchMonParam], a
 	ret
 
