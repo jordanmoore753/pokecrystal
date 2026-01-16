@@ -3057,6 +3057,11 @@ CamperGroup:
 	db 30, TAUROS
 	db -1 ; end
 
+	; CAMPER (23)
+	db "TESTER@", TRAINERTYPE_MOVES
+	db 26, MUK,   TOXIC, NO_MOVE, NO_MOVE, NO_MOVE
+	db -1 ; end
+
 ExecutiveFGroup:
 	; EXECUTIVEF (1)
 	db "EXECUTIVE@", TRAINERTYPE_MOVES
